@@ -1,5 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:wallet_v2/controller/data.service.dart';
+import 'package:wallet_v2/controller/price.pipe.dart';
 
 class MyPieChart extends StatefulWidget {
   @override
@@ -8,9 +10,13 @@ class MyPieChart extends StatefulWidget {
 
 class MyPieChartState extends State<MyPieChart> {
   int touchedIndex;
+  int _cost = 0;
+  int _income = 0;
+  int _balance = 0;
 
   @override
   Widget build(BuildContext context) {
+    _getData();
     return AspectRatio(
       aspectRatio: 1.2,
       child: Card(
@@ -83,17 +89,37 @@ class MyPieChartState extends State<MyPieChart> {
     );
   }
 
+  _getData() async {
+    DataService dataService = new DataService();
+    List<Transaction> trans = await dataService.transactions();
+    int cost = 0;
+    int income = 0;
+    int balance = 0;
+    trans.forEach((e) {
+      if (e.isIncome == 1) {
+        income += e.amount;
+        balance += e.amount;
+      } else {
+        cost += e.amount;
+        balance -= e.amount;
+      }
+    });
+    this._balance = balance;
+    this._income = income;
+    this._cost = cost;
+  }
+
   List<PieChartSectionData> showingSections() {
     return List.generate(3, (i) {
       final isTouched = i == touchedIndex;
-      final double fontSize = isTouched ? 25 : 16;
+      final double fontSize = isTouched ? 16 : 12;
       final double radius = isTouched ? 60 : 50;
       switch (i) {
         case 0:
           return PieChartSectionData(
             color: Colors.pink,
-            value: 60,
-            title: '40%',
+            value: _cost.toDouble(),
+            title: priceConvertor(_cost) + '\$',
             radius: radius,
             titleStyle: TextStyle(
               fontSize: fontSize,
@@ -104,8 +130,8 @@ class MyPieChartState extends State<MyPieChart> {
         case 1:
           return PieChartSectionData(
             color: Colors.lightBlue,
-            value: 30,
-            title: '30%',
+            value: _income.toDouble(),
+            title: priceConvertor(_income) + '\$',
             radius: radius,
             titleStyle: TextStyle(
               fontSize: fontSize,
@@ -116,8 +142,8 @@ class MyPieChartState extends State<MyPieChart> {
         case 2:
           return PieChartSectionData(
             color: const Color(0xff13d38e),
-            value: 15,
-            title: '15%',
+            value: _balance.toDouble(),
+            title: priceConvertor(_balance) + '\$',
             radius: radius,
             titleStyle: TextStyle(
               fontSize: fontSize,

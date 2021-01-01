@@ -86,7 +86,6 @@ class MyBarChartState extends State<MyBarChart> {
   showingGroups() async {
     DataService dataService = new DataService();
     List<Transaction> trans = await dataService.transactions();
-    int i = 0;
     List<BarChartGroupData> bcg = [];
     int max = 0;
     trans.forEach((e) {

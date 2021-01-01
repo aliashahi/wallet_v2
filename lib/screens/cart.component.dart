@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:wallet_v2/controller/data.service.dart';
+import 'package:wallet_v2/controller/price.pipe.dart';
 
 typedef void IntCallback(int id);
 
@@ -39,7 +40,7 @@ class TransactionCard extends StatelessWidget {
               onDelete(transaction.id);
             },
             trailing: Text(
-              transaction.amount.toString() + '\$',
+              priceConvertor(transaction.amount) + '\$',
               style: TextStyle(
                 color: transaction.isIncome == 1
                     ? Colors.lightBlue[300]

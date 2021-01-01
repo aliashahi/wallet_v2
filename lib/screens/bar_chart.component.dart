@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:wallet_v2/controller/data.service.dart';
 
 class MyBarChart extends StatefulWidget {
   @override
@@ -8,11 +9,12 @@ class MyBarChart extends StatefulWidget {
 
 class MyBarChartState extends State<MyBarChart> {
   final Duration animDuration = const Duration(milliseconds: 250);
-
+  List<BarChartGroupData> data = [];
   int touchedIndex;
 
   @override
   Widget build(BuildContext context) {
+    showingGroups();
     return AspectRatio(
       aspectRatio: 1.2,
       child: Card(
@@ -37,13 +39,13 @@ class MyBarChartState extends State<MyBarChart> {
                   SizedBox(
                     height: 4,
                   ),
-                  Text(
-                    '99/08/01 to 99/09/30',
-                    style: TextStyle(
-                        color: Color(0xff379982),
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold),
-                  ),
+                  // Text(
+                  //   '99/08/01 to 99/09/30',
+                  //   style: TextStyle(
+                  //       color: Color(0xff379982),
+                  //       fontSize: 18,
+                  //       fontWeight: FontWeight.bold),
+                  // ),
                   SizedBox(
                     height: 30,
                   ),
@@ -81,53 +83,85 @@ class MyBarChartState extends State<MyBarChart> {
     );
   }
 
-  BarChartGroupData makeGroupData(
-    int x,
-    double y, {
-    bool isTouched = false,
-    Color barColor = Colors.pink,
-    double width = 20,
-    double max = 15,
-    List<int> showTooltips = const [],
-  }) {
+  showingGroups() async {
+    DataService dataService = new DataService();
+    List<Transaction> trans = await dataService.transactions();
+    int i = 0;
+    List<BarChartGroupData> bcg = [];
+    int max = 0;
+    trans.forEach((e) {
+      if (e.amount > max) max = e.amount;
+    });
+    trans.forEach((Transaction element) {
+      switch ((element.time.weekday + 1) % 7) {
+        case 0:
+          element.isIncome == 1
+              ? bcg.add(
+                  makeGroupData(element, 1, max, barColor: Colors.blueAccent))
+              : bcg.add(makeGroupData(element, 2, max));
+          break;
+        case 1:
+          element.isIncome == 1
+              ? bcg.add(
+                  makeGroupData(element, 3, max, barColor: Colors.blueAccent))
+              : bcg.add(makeGroupData(element, 4, max));
+          break;
+        case 2:
+          element.isIncome == 1
+              ? bcg.add(
+                  makeGroupData(element, 5, max, barColor: Colors.blueAccent))
+              : bcg.add(makeGroupData(element, 6, max));
+          break;
+        case 3:
+          element.isIncome == 1
+              ? bcg.add(
+                  makeGroupData(element, 7, max, barColor: Colors.blueAccent))
+              : bcg.add(makeGroupData(element, 8, max));
+          break;
+        case 4:
+          element.isIncome == 1
+              ? bcg.add(
+                  makeGroupData(element, 9, max, barColor: Colors.blueAccent))
+              : bcg.add(makeGroupData(element, 10, max));
+          break;
+        case 5:
+          element.isIncome == 1
+              ? bcg.add(
+                  makeGroupData(element, 11, max, barColor: Colors.blueAccent))
+              : bcg.add(makeGroupData(element, 12, max));
+          break;
+        case 6:
+          element.isIncome == 1
+              ? bcg.add(
+                  makeGroupData(element, 13, max, barColor: Colors.blueAccent))
+              : bcg.add(makeGroupData(element, 14, max));
+          break;
+        default:
+          break;
+      }
+    });
+    this.data = bcg;
+  }
+
+  BarChartGroupData makeGroupData(Transaction t, int index, int max,
+      {Color barColor = Colors.pink, double width = 10}) {
     return BarChartGroupData(
-      x: x,
+      x: index,
       barRods: [
         BarChartRodData(
-          y: y,
+          y: t.amount.toDouble(),
           colors: [barColor],
           width: width,
           backDrawRodData: BackgroundBarChartRodData(
             show: true,
-            y: max + 5,
+            y: max.toDouble() + 5,
             colors: [Theme.of(context).backgroundColor],
           ),
         ),
       ],
-      showingTooltipIndicators: showTooltips,
+      showingTooltipIndicators: [],
     );
   }
-
-  List<BarChartGroupData> showingGroups() => List.generate(7, (i) {
-        switch (i) {
-          case 0:
-            return makeGroupData(0, 12, isTouched: i == touchedIndex);
-          case 1:
-            return makeGroupData(1, 6.5, isTouched: i == touchedIndex);
-          case 2:
-            return makeGroupData(2, 5, isTouched: i == touchedIndex);
-          case 3:
-            return makeGroupData(3, 7.5, isTouched: i == touchedIndex);
-          case 4:
-            return makeGroupData(4, 9, isTouched: i == touchedIndex);
-          case 5:
-            return makeGroupData(5, 11.5, isTouched: i == touchedIndex);
-          case 6:
-            return makeGroupData(6, 6.5, isTouched: i == touchedIndex);
-          default:
-            return null;
-        }
-      });
 
   BarChartData mainBarData() {
     return BarChartData(
@@ -179,24 +213,41 @@ class MyBarChartState extends State<MyBarChart> {
         bottomTitles: SideTitles(
           showTitles: true,
           getTextStyles: (value) => const TextStyle(
-              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
-          margin: 16,
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 10,
+          ),
+          margin: 10,
           getTitles: (double value) {
             switch (value.toInt()) {
-              case 0:
-                return 'S';
               case 1:
-                return 'S';
+                return 'SAT\nincome';
               case 2:
-                return 'M';
+                return 'SAT\ncost';
               case 3:
-                return 'T';
+                return 'SUN\nincome';
               case 4:
-                return 'W';
+                return 'SUN\ncost';
               case 5:
-                return 'T';
+                return 'MON\nincome';
               case 6:
-                return 'F';
+                return 'MON\ncost';
+              case 7:
+                return 'TUR\nincome';
+              case 8:
+                return 'TUR\ncost';
+              case 9:
+                return 'WED\nincome';
+              case 10:
+                return 'WED\ncost';
+              case 11:
+                return 'THU\nincome';
+              case 12:
+                return 'THU\nout';
+              case 13:
+                return 'FRI\nincome';
+              case 14:
+                return 'FRI\ncost';
               default:
                 return '';
             }
@@ -209,7 +260,7 @@ class MyBarChartState extends State<MyBarChart> {
       borderData: FlBorderData(
         show: false,
       ),
-      barGroups: showingGroups(),
+      barGroups: data ?? [],
     );
   }
 }

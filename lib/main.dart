@@ -37,7 +37,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<Widget> recentList = [];
-  createAppBar() {
+  _createAppBar() {
     return AppBar(
       toolbarHeight: 70,
       title: Text(
@@ -87,7 +87,7 @@ class _HomePageState extends State<HomePage> {
     return SafeArea(
       child: Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
-        appBar: createAppBar(),
+        appBar: _createAppBar(),
         body: Container(
           height: size.height,
           decoration: BoxDecoration(

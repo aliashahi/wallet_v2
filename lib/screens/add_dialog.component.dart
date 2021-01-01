@@ -177,7 +177,7 @@ Future<Transaction> openDialog(context) async {
           return new Transaction(
               amount: int.parse(enteredValue),
               isIncome: isIncome ? 1 : 0,
-              time: DateTime.now(),
+              time: DateTime.now().add(Duration(days: -1)),
               title: enteredTitle);
         } catch (e) {
           return null;

@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:wallet_v2/controller/data.service.dart';
 
-Future<void> openDialog(context) async {
+Future<Transaction> openDialog(context) async {
+  String enteredValue;
+  String enteredTitle;
+  bool isIncome = false;
   switch (await showDialog<int>(
       context: context,
       builder: (BuildContext context) {
@@ -16,19 +20,53 @@ Future<void> openDialog(context) async {
                   end: Alignment.topRight,
                   colors: [Colors.cyan[900], Colors.grey[800]],
                 )),
-            height: 190,
+            height: 280,
             child: SingleChildScrollView(
               child: Column(
                 children: <Widget>[
                   Container(
-                    height: 70,
+                    height: 60,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20),
                       color: Colors.white12,
                     ),
                     margin: EdgeInsets.symmetric(
                       horizontal: 30,
-                      vertical: 20,
+                      vertical: 10,
+                    ),
+                    child: TextField(
+                      textAlign: TextAlign.center,
+                      textAlignVertical: TextAlignVertical.center,
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 25,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      keyboardType: TextInputType.name,
+                      onChanged: (value) {
+                        enteredTitle = value;
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'Title like Shoping!!',
+                        hintStyle: TextStyle(
+                          color: Colors.white70.withOpacity(0.5),
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    height: 60,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.white12,
+                    ),
+                    margin: EdgeInsets.symmetric(
+                      horizontal: 30,
+                      vertical: 5,
                     ),
                     child: TextField(
                       textAlign: TextAlign.center,
@@ -39,9 +77,11 @@ Future<void> openDialog(context) async {
                         fontWeight: FontWeight.w500,
                       ),
                       keyboardType: TextInputType.number,
-                      onChanged: (value) {},
+                      onChanged: (value) {
+                        enteredValue = value;
+                      },
                       decoration: InputDecoration(
-                        hintText: 'like 10000.0000\$',
+                        hintText: 'Amount like 100\$',
                         hintStyle: TextStyle(
                           color: Colors.white70.withOpacity(0.5),
                           fontSize: 20,
@@ -50,6 +90,31 @@ Future<void> openDialog(context) async {
                         enabledBorder: InputBorder.none,
                         focusedBorder: InputBorder.none,
                       ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Container(
+                    height: 30,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Checkbox(
+                          onChanged: (value) {
+                            isIncome = !isIncome;
+                          },
+                          value: isIncome,
+                        ),
+                        Text(
+                          "its an income ?? ",
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   SizedBox(
@@ -104,11 +169,23 @@ Future<void> openDialog(context) async {
         );
       })) {
     case 0:
-      // Let's go.
-      // ...
+      return null;
       break;
     case 1:
-      // ...
+      if (enteredValue != null) {
+        try {
+          return new Transaction(
+              amount: int.parse(enteredValue),
+              isIncome: isIncome ? 1 : 0,
+              time: DateTime.now(),
+              title: enteredTitle);
+        } catch (e) {
+          return null;
+        }
+      }
+      break;
+    default:
+      return null;
       break;
   }
 }

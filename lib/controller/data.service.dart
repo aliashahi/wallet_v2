@@ -1,23 +1,19 @@
 import 'dart:async';
 import 'package:flutter/widgets.dart';
-import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DataService {
   Future<Database> _database;
-  // Avoid errors caused by flutter upgrade.
-  // Importing 'package:flutter/widgets.dart' is required.
+  DataService() {
+    dataService();
+  }
   dataService() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  _database = openDatabase(
-    // Set the path to the database. Note: Using the `join` function from the
-    // `path` package is best practice to ensure the path is correctly
-    // constructed for each platform.
-    join(await getDatabasesPath(), 'wallet_database.db'),
-    // When the database is first created, create a table to store dogs.
-    onCreate: (db, version) {
-      return db.execute(
-        """CREATE TABLE transactions
+    WidgetsFlutterBinding.ensureInitialized();
+    _database = openDatabase(
+      'assets/databases/wallet_database.db',
+      onCreate: (db, version) {
+        return db.execute(
+          """CREATE TABLE transactions
         (
         id INTEGER PRIMARY KEY,
         title TEXT,
@@ -26,22 +22,18 @@ class DataService {
         isIncome INTEGER
         )
         """,
-      );
-    },
-    // Set the version. This executes the onCreate function and provides a
-    // path to perform database upgrades and downgrades.
-    version: 1,
-  );
+        );
+      },
+      version: 1,
+    );
   }
   // Open the database and store the reference.
 
   Future<void> insertTransaction(Transaction transaction) async {
-    // Get a reference to the database.
     final Database db = await _database;
-
-    // Insert the transaction into the correct table. Also specify the
-    // `conflictAlgorithm`. In this case, if the same transaction is inserted
-    // multiple times, it replaces the previous data.
+    if (db == null) {
+      return;
+    }
     await db.insert(
       'transactions',
       transaction.toMap(),
@@ -50,9 +42,10 @@ class DataService {
   }
 
   Future<List<Transaction>> transactions() async {
-    // Get a reference to the database.
     final Database db = await _database;
-
+    if (db == null) {
+      return [];
+    }
     // Query the table for all The Dogs.
     final List<Map<String, dynamic>> maps = await db.query('transactions');
 
@@ -61,7 +54,7 @@ class DataService {
       return Transaction(
         id: maps[i]['id'],
         title: maps[i]['title'],
-        time: maps[i]['time'],
+        time: DateTime.parse(maps[i]['time']),
         amount: maps[i]['amount'],
         isIncome: maps[i]['isIncome'],
       );
@@ -71,7 +64,9 @@ class DataService {
   Future<void> updateTransaction(Transaction transaction) async {
     // Get a reference to the database.
     final db = await _database;
-
+    if (db == null) {
+      return;
+    }
     // Update the given Dog.
     await db.update(
       'transactions',
@@ -86,7 +81,9 @@ class DataService {
   Future<void> deleteTransaction(int id) async {
     // Get a reference to the database.
     final db = await _database;
-
+    if (db == null) {
+      return;
+    }
     // Remove the Dog from the database.
     await db.delete(
       'transactions',
@@ -101,17 +98,23 @@ class DataService {
 class Transaction {
   final int id;
   final String title;
-  final String time;
+  final DateTime time;
   final int amount;
   final int isIncome;
 
-  Transaction({this.id,this.title, this.time, this.amount, this.isIncome, });
+  Transaction({
+    this.id,
+    this.title,
+    this.time,
+    this.amount,
+    this.isIncome,
+  });
 
   Map<String, dynamic> toMap() {
     return {
       'id': id,
       'title': title,
-      'time': time,
+      'time': time.toString(),
       'amount': amount,
       'isIncome': isIncome,
     };

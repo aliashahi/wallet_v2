@@ -1,12 +1,12 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
-class BarChartSample1 extends StatefulWidget {
+class MyBarChart extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() => BarChartSample1State();
+  State<StatefulWidget> createState() => MyBarChartState();
 }
 
-class BarChartSample1State extends State<BarChartSample1> {
+class MyBarChartState extends State<MyBarChart> {
   final Duration animDuration = const Duration(milliseconds: 250);
 
   int touchedIndex;
@@ -14,7 +14,7 @@ class BarChartSample1State extends State<BarChartSample1> {
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
-      aspectRatio: 1,
+      aspectRatio: 1.2,
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
         color: Theme.of(context).backgroundColor,

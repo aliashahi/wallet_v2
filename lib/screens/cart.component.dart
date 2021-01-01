@@ -1,12 +1,15 @@
-import 'dart:math';
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
+import 'package:wallet_v2/controller/data.service.dart';
+
+typedef void IntCallback(int id);
 
 class TransactionCard extends StatelessWidget {
-  TransactionCard({Key key}) : super(key: key);
-  final income = Random().nextBool();
-  final amount = Random().nextInt(1000).toString() + '.99';
+  final IntCallback onDelete;
+  final Transaction transaction;
+  TransactionCard({Key key, this.transaction, @required this.onDelete})
+      : super(key: key);
+
   stockIcon(raised) {
     return ClipRect(
       child: Container(
@@ -27,29 +30,34 @@ class TransactionCard extends StatelessWidget {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 0, horizontal: 5),
       height: 70,
-      child: Expanded(
-        child: Container(
-          child: Card(
-            elevation: 0,
-            color: Theme.of(context).backgroundColor,
-            child: ListTile(
-              trailing: Text(
-                amount + '\$',
-                style: TextStyle(
-                  color: income ? Colors.lightBlue[300] : Colors.pink,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.8,
-                ),
+      child: Container(
+        child: Card(
+          elevation: 0,
+          color: Theme.of(context).backgroundColor,
+          child: ListTile(
+            onLongPress: () {
+              onDelete(transaction.id);
+            },
+            trailing: Text(
+              transaction.amount.toString() + '\$',
+              style: TextStyle(
+                color: transaction.isIncome == 1
+                    ? Colors.lightBlue[300]
+                    : Colors.pink,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.8,
               ),
-              autofocus: true,
-              leading: stockIcon(income),
-              title: Text(
-                'Balance',
-                style: TextStyle(
-                  color: income ? Colors.lightBlue[300] : Colors.pink,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.8,
-                ),
+            ),
+            autofocus: true,
+            leading: stockIcon(transaction.isIncome == 1),
+            title: Text(
+              transaction.title,
+              style: TextStyle(
+                color: transaction.isIncome == 1
+                    ? Colors.lightBlue[300]
+                    : Colors.pink,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.8,
               ),
             ),
           ),
